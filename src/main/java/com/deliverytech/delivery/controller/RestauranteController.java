@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.deliverytech.delivery.dto.request.RestauranteRequest;
 import com.deliverytech.delivery.dto.response.RestauranteResponse;
+import com.deliverytech.delivery.exception.ConflictException;
+import com.deliverytech.delivery.exception.EntityNotFoundException;
 import com.deliverytech.delivery.model.Restaurante;
+import com.deliverytech.delivery.repository.RestauranteRepository;
 import com.deliverytech.delivery.service.RestauranteService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class RestauranteController {
 
         private final RestauranteService restauranteService;
+        private final RestauranteRepository restauranteRepository; // necessário para verificar a existência do
+                                                                   // restaurante
 
         @PostMapping
         public ResponseEntity<RestauranteResponse> cadastrar(@RequestBody RestauranteRequest request) {
@@ -36,6 +41,16 @@ public class RestauranteController {
                                 .tempoEntregaMinutos(request.getTempoEntregaMinutos())
                                 .ativo(true)
                                 .build();
+
+                // Exemplo de uso do ConflictException
+                // Verifica se já existe um restaurante com o mesmo nome
+                if (restauranteRepository.findByNome(restaurante.getNome()).isPresent()) {
+                        throw new ConflictException(
+                                        "Já existe um restaurante cadastrado com este nome.",
+                                        "nome",
+                                        restaurante.getNome());
+                }
+
                 Restaurante salvo = restauranteService.cadastrar(restaurante);
                 return ResponseEntity.ok(new RestauranteResponse(
                                 salvo.getId(), salvo.getNome(), salvo.getCategoria(), salvo.getTelefone(),
@@ -73,6 +88,12 @@ public class RestauranteController {
         @PutMapping("/{id}")
         public ResponseEntity<RestauranteResponse> atualizar(@PathVariable Long id,
                         @RequestBody RestauranteRequest request) {
+
+                // Exmplo de uso do EntityNotFoundException
+                // Garante que o restaurante existe antes de atualizar
+                restauranteRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Restaurante", id));
+
                 Restaurante atualizado = Restaurante.builder()
                                 .nome(request.getNome())
                                 .telefone(request.getTelefone())
