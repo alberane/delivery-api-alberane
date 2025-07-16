@@ -47,4 +47,9 @@ public class RestauranteServiceImpl implements RestauranteService {
                     return restauranteRepository.save(r);
                 }).orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
     }
+
+    @Override
+    public boolean findByNome(String nome) {
+        return restauranteRepository.findByNome(nome).isPresent();
+    }
 }

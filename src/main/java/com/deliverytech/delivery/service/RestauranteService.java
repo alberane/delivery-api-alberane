@@ -15,4 +15,7 @@ public interface RestauranteService {
     List<Restaurante> buscarPorCategoria(String categoria);
 
     Restaurante atualizar(Long id, Restaurante restauranteAtualizado);
+
+    boolean findByNome(String nome);
+
 }
