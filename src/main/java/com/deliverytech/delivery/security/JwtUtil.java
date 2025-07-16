@@ -19,7 +19,7 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "mysecretkey12345678901234567890";
+    private final String SECRET_KEY = "mysecretkey12345678901234567890123456789012345678901234567890123"; // 64
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
